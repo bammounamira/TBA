@@ -211,6 +211,7 @@ class Actions:
                     f"Remaining credit: {remaining_credit}€\n"
                     f"Thanks for playing See you next time!")
             game.finished=True
+            ####
 
     def receipt(player,game,args):
             """
