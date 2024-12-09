@@ -5,6 +5,7 @@
 from character import Character
 from room import Room
 import random
+from player import player
 
 import threading
 import time 
@@ -218,32 +219,11 @@ class Actions:
                 player.total -= item_price
                 print(f"You have dropped the {item_name}.")
             else:
-                print(f"{item_name} is not in your cart.")
-    
+                print(f"{item_name} is not in your cart.") 
+
     #ajout du timer 
 
-
-
-    def inventory(self, player, game,): 
-    """return the inventory of the player"""
-    if not player.cart:
-        print("Your inventory is empty. You haven't picked up any items yet!")
-        return
-
-    # Build the inventory display
-    print("----- Your Inventory -----")
-    for item_name, price in player.cart.items():
-        print(f"- {item_name}: {price}€")
-    print("--------------------------")
-    print(f"Total: {player.total}€")
-    
     def start_timer(duration):
-        """
-        Starts a countdown timer for the game.
-
-        Args:
-            duration (int): The duration of the timer in seconds.
-        """
         global timer_expired
         time.sleep(duration)
         Actions.timer_expired = True
