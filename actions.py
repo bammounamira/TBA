@@ -129,8 +129,8 @@ class Actions:
 
     def look(player, game, args):
             """
-    Displays the items in the current room.
-    """
+        Displays the items in the current room.
+        """
             current_room = player.current_room
 
     # Check if there are items in the room
@@ -145,15 +145,29 @@ class Actions:
                 """
         Moves the player in a specified direction.
         """
-        directions= { "N": "N", "NORTH": "N", "North": "N", "north": "N",
-                    "E": "E", "EAST": "E", "East": "E", "east": "E",
-                    "S": "S", "SOUTH": "S", "South": "S", "south": "S",
-                    "W": "W", "WEST": "W", "West": "W", "west": "W", "w": "W"}
+        directions={
+            "N": "N",
+            "NORTH": "N", 
+            "North": "N",
+            "north": "N",
+            "E": "E", 
+            "EAST": "E", 
+            "East": "E", 
+            "east": "E",
+            "S": "S", 
+            "SOUTH": "S", 
+            "South": "S", 
+            "south": "S",
+            "W": "W",
+            "WEST": "W", 
+            "West": "W", 
+            "west": "W", 
+            "w": "W"
+        }
         if not args:
             print("You need to specify a direction.")
             return
 
-        
         direction = args[0].upper()  # Extract the direction
         direction=directions.get(direction) #extract the values of the dictionnary
         current_room = player.current_room
