@@ -142,22 +142,28 @@ class Actions:
                 print(f"   - {item.name}: {item.description}")
     
     def go(player, game, args):
-        """
+                """
         Moves the player in a specified direction.
         """
+        directions= { "N": "N", "NORTH": "N", "North": "N", "north": "N",
+                    "E": "E", "EAST": "E", "East": "E", "east": "E",
+                    "S": "S", "SOUTH": "S", "South": "S", "south": "S",
+                    "W": "W", "WEST": "W", "West": "W", "west": "W", "w": "W"}
         if not args:
-            print("You need to specify a direction (N, E, S, W).")
+            print("You need to specify a direction.")
             return
 
+        
         direction = args[0].upper()  # Extract the direction
+        direction=directions.get(direction) #extract the values of the dictionnary
         current_room = player.current_room
         next_room = current_room.get_exit(direction)
-        
         if next_room:
             player.current_room = next_room
             player.room_history.append(current_room)
             print(f"You moved to {next_room.name}.")
             print(next_room.get_long_description())
+            print(f"Room history: {[room.name for room in player.room_history]}")
         else:
             print("You cannot go in that direction.")
 
@@ -175,7 +181,9 @@ class Actions:
             if player.room_history:
                 previous_room = player.room_history.pop()
                 player.current_room=previous_room
+                player.current_room=previous_room
                 print(f"You go back. You are now in {previous_room.name}.")  # Use f-string for dynamic room name
+                print(f"Room history: {[room.name for room in player.room_history]}")
             else :
                 print ("You can't go back. There is no previous room in your history.")
 
