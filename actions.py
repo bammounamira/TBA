@@ -213,7 +213,7 @@ class Actions:
 
 
 
-    def inventory(self, player, game, args):
+    def inventory(self, player, game,): 
     """return the inventory of the player"""
     if not player.cart:
         print("Your inventory is empty. You haven't picked up any items yet!")
