@@ -5,14 +5,16 @@
 from character import Character
 from room import Room
 import random
+
+import threading
+import time 
+
 class Actions: 
     """
     A class that defines all the possible actions a player can take in the game.
     """
-    class Actions:
-        """
-    A class that defines all the possible actions a player can take in the game.
-    """
+    timer_expired = False
+
     def play(self, player, game):
         """
         Starts or restarts the game.
@@ -24,6 +26,11 @@ class Actions:
         # Reset the game
         #
         # game.setup()
+
+        #Start the timer 
+        timer_thread = threading.Thread(target=Actions.start_timer, args=(300,))  # 5 minutes timer
+        timer_thread.daemon = True  # Ensures the timer ends with the main program
+        timer_thread.start()
 
         # Welcome message
         print(f"Welcome to MIMI, {player.name}! Your shopping adventure begins now.")
@@ -106,6 +113,18 @@ class Actions:
     # If no match is found
            
             print(f"The item '{item_name}' is not in this room.")
+            
+    #if the player took the item
+
+            if item in player.current_room.inventory:
+                discounted_price=item.discounted_price()
+                player.cart[item.name]=discounted_price
+                player.total=player.total+discounted_price
+                player.current_room.inventory.remove(item) # Retire l'objet de la pièce
+                player.add_item(item.name, item.price)
+                self.total += item.price   # Update the total cost of items in the cart
+                return f"you have taken the {item.name}.Price: {[discounted_price].euros. TOtal: player.total}euros"
+
     def look(player, game, args):
             """
     Displays the items in the current room.
@@ -197,6 +216,12 @@ class Actions:
         Returns: 
             A message indicating whether the player succeded or failed. 
         """
+            if Actions.timer_expired:
+                return ("Time's up! Your shopping adventure has ended. "
+                        f"Cart total: {player.total}€\n"
+                        f"Gift card value: {player.gift_card}€\n"
+                        f"Remaining credit: {player.gift_card - player.total}€.\n"
+                        "Thanks for playing!")
             if not isinstance(player.gift_card, (int, float)):
                 player.gift_card = player.gift_card[0] if isinstance(player.gift_card, tuple) else 0  # Fix tuple issue
             remaining_credit = player.gift_card - player.total
@@ -257,6 +282,13 @@ class Actions:
                     "- back: Go back to the previous room.\n"
                     "- buy: Finalize your shopping.\n"
                     "- quit: Exit the game.")
+    
+
+    def start_timer(duration: int):
+        global timer_expired
+        time.sleep(duration)
+        Actions.timer_expired = True
+        print("\nTime's up! Your shopping adventure has ended. Let's see how you did.\n")
 
 
     def quit(player,game,number_of_arguments):
