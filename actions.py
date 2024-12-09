@@ -113,7 +113,7 @@ class Actions:
     # If no match is found
            
             print(f"The item '{item_name}' is not in this room.")
-            
+
     #if the player took the item
 
             if item in player.current_room.inventory:
@@ -197,6 +197,7 @@ class Actions:
             item_name = " ".join(args).strip()
             print(f"Attempting to drop '{item_name}' from cart.")
 
+    
     # Check if the item exists in the cart
             if item_name in player.cart:
                 item_price = player.cart[item_name]
@@ -205,6 +206,22 @@ class Actions:
                 print(f"You have dropped the {item_name}.")
             else:
                 print(f"{item_name} is not in your cart.")
+    
+    #ajout du timer 
+
+
+    
+    def start_timer(duration):
+        """
+        Starts a countdown timer for the game.
+
+        Args:
+            duration (int): The duration of the timer in seconds.
+        """
+        global timer_expired
+        time.sleep(duration)
+        Actions.timer_expired = True
+        print("\nTime's up! Your shopping adventure has ended. Let's see how you did.\n")
 
     def buy(player,game,args):
             """ 
@@ -282,13 +299,6 @@ class Actions:
                     "- back: Go back to the previous room.\n"
                     "- buy: Finalize your shopping.\n"
                     "- quit: Exit the game.")
-    
-
-    def start_timer(duration: int):
-        global timer_expired
-        time.sleep(duration)
-        Actions.timer_expired = True
-        print("\nTime's up! Your shopping adventure has ended. Let's see how you did.\n")
 
 
     def quit(player,game,number_of_arguments):
