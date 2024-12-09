@@ -50,6 +50,8 @@ class Actions:
         """
         command_parts = command_string.split()
         command_word = command_parts[0]
+        if commad_word in ("inventory", "i"):
+            self.inventory(player, game, command_parts[1:])
         if command_word in game.commands:
             game.commands[command_word].action(player, game, command_parts[1:])
         else:
@@ -210,6 +212,19 @@ class Actions:
     #ajout du timer 
 
 
+
+    def inventory(self, player, game, args):
+    """return the inventory of the player"""
+    if not player.cart:
+        print("Your inventory is empty. You haven't picked up any items yet!")
+        return
+
+    # Build the inventory display
+    print("----- Your Inventory -----")
+    for item_name, price in player.cart.items():
+        print(f"- {item_name}: {price}€")
+    print("--------------------------")
+    print(f"Total: {player.total}€")
     
     def start_timer(duration):
         """
