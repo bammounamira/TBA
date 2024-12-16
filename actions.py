@@ -5,7 +5,6 @@
 from character import Character
 from room import Room
 import random
-from player import player
 
 import threading
 import time 

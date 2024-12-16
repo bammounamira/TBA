@@ -5,4 +5,4 @@ class Character():
         self.name= name
         self.description= description 
         self.current_room= current_room
-        self.dialogues= dialogues
+        
