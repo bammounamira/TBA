@@ -17,30 +17,31 @@ class Game :
         self.commands = {}
         self.player = None
         self.direction_ensemble = set()
+        self.actions = Actions()
 
  # Setup the game
     def setup(self):
 
         # Setup commands
-        help = Command("help", " : Display a list of available commands.", Actions.help, 0,"Shows all available commands and their descriptions.")
+        help = Command("help", " : Display a list of available commands.", self.actions.help, 0,"Shows all available commands and their descriptions.")
         self.commands["help"] = help
-        quit = Command("quit", " : Exit the store.", Actions.quit, 0,"Ends the game and exits.")
+        quit = Command("quit", " : Exit the store.", self.actions.quit, 0,"Ends the game and exits.")
         self.commands["quit"] = quit
-        go = Command("go", " <direction> : Move to another section of the store (N, E, S, W).", Actions.go, 1,"Move in a specified direction (e.g., 'go north').")
+        go = Command("go", " <direction> : Move to another section of the store (N, E, S, W).", self.actions.go, 1,"Move in a specified direction (e.g., 'go north').")
         self.commands["go"] = go
-        back = Command("back", " : Return to the previous section.", Actions.back, 0,"Returns to the previous room you visited.")
+        back = Command("back", " : Return to the previous section.", self.actions.back, 0,"Returns to the previous room you visited.")
         self.commands["back"] = back
-        look = Command("look", " : View the inventory of items in the current section.", Actions.look, 0,"Adds an item to your cart from the current room.")
+        look = Command("look", " : View the inventory of items in the current section.", self.actions.look, 0,"Adds an item to your cart from the current room.")
         self.commands["look"] = look
-        take = Command("take", " <item> : Pick up an item from the current section.", Actions.take, 1, "Adds an item to your cart from the current room.")
+        take = Command("take", " <item> : Pick up an item from the current section.", self.actions.take, 1, "Adds an item to your cart from the current room.")
         self.commands["take"] = take
-        drop = Command("drop", " <item> : Return an item to the current section.", Actions.drop, 1,"Removes an item from your cart and returns it to the room.")
+        drop = Command("drop", " <item> : Return an item to the current section.", self.actions.drop, 1,"Removes an item from your cart and returns it to the room.")
         self.commands["drop"] = drop
-        buy = Command("buy", ":Finalize your shopping.", Actions.buy, 0,"Finalize your shopping and check if you stayed within yoour budget")
+        buy = Command("buy", ":Finalize your shopping.", self.actions.buy, 0,"Finalize your shopping and check if you stayed within yoour budget")
         self.commands["buy"] = buy
-        play= Command("play","Start or restart the game.", Actions.play,0,"plays the game")
+        play= Command("play","Start or restart the game.", self.actions.play,0,"plays the game")
         self.commands["play"]= play
-        receipt= Command("receipt","Give you the receipt.", Actions.receipt,0,"Shows a summary of the items in your cart and the total")
+        receipt= Command("receipt","Give you the receipt.", self.actions.receipt,0,"Shows a summary of the items in your cart and the total")
         self.commands["receipt"]= receipt
 
 #setup rooms
@@ -115,37 +116,37 @@ class Game :
     
 
 #Setup Items
-        sweater= Item("A pink sweater", "A cozy pink sweater, perfect for staying warm on chilly days","15")
-        turtleneck= Item("A blue turtleneck", "A stylish blue turtleneck that adds elegance to your winter wardrobe.","18")
-        jumper= Item("A Christmas jumper", "A festive Christmas sweater featuring cheerful holiday patterns","20")
-        sweatshirt= Item("A white sweatshirt", "A casual white sweatshirt, ideal for a relaxed and sporty look","12")
-        coat = Item("A black coat", "A classic black coat, perfect for formal and casual winter outings", "25")
-        puffer = Item("A green puffer jacket", "A warm green puffer jacket, ideal for chilly weather", "30")
-        trench = Item("A beige trench coat", "A timeless beige trench coat for a sophisticated winter look", "35")
-        fur_coat = Item("A brown fur coat", "A luxurious brown fur coat that combines style and warmth", "40")
-        shirt = Item("A blue shirt", "A classic blue shirt, versatile for both formal and casual occasions", "14")        
-        tshirt = Item("A mauve round-neck T-shirt", "A comfortable mauve T-shirt with a round neck, perfect for layering", "10")
-        bandeau = Item("A red bandeau", "A vibrant red bandeau that adds a chic touch to your outfit", "8")
-        croptop = Item("A pastel yellow crop top", "A trendy pastel yellow crop top, great for pairing with high-waisted pants", "12")
-        jeans = Item("A blue baggy jean", "A relaxed-fit blue baggy jean for a laid-back and stylish look", "20")
-        pants = Item("A black straight-leg pant", "A sleek black straight-leg pant, ideal for a professional or casual style", "18")
-        shorts = Item("A bottle-green short", "A bottle-green short, perfect for a chic and comfortable summer look", "12")
-        skirt = Item("A caramel skirt", "A caramel-colored skirt that exudes elegance and sophistication", "15")
-        watch = Item("A gold watch", "A luxurious gold watch that complements any outfit with a touch of class", "40")
-        earrings = Item("A pair of gold earrings", "Elegant gold earrings, perfect for adding sparkle to your look", "25")
-        necklace = Item("A silver necklace", "A delicate silver necklace, a timeless piece for any occasion", "20")
-        ring = Item("A gold ring", "A chic gold ring that adds a subtle but striking detail to your style", "18")
-        scarf1 = Item("A grey scarf", "A soft grey scarf to keep you cozy and stylish in cold weather", "10")
-        gloves = Item("Black gloves", "Classic black gloves that combine warmth and sophistication", "8")
-        beanie = Item("A red beanie", "A warm and vibrant red beanie, perfect for chilly winter days", "6")
-        scarf2 = Item("A khaki scarf", "A lightweight khaki scarf that adds a touch of elegance to your outfit", "9")
-        square_sunglasses = Item("Black square sunglasses", "Stylish black square sunglasses that offer both sun protection and flair", "12")
-        leopard_sunglasses = Item("Leopard rectangular sunglasses", "Trendy leopard-print rectangular sunglasses for a bold statement", "15")
-        oversized_sunglasses = Item("Oversized sunglasses", "Chic oversized sunglasses that provide full coverage and timeless elegance", "18")
-        heels = Item("Black heels", "Sophisticated black heels, perfect for formal events or nights out", "25")
-        boots = Item("Brown boots", "Durable brown boots, ideal for keeping your feet warm and stylish", "30")
-        sneakers = Item("White sneakers", "Comfortable and versatile white sneakers, perfect for any casual outfit", "20")
-        slippers = Item("Pink slippers", "Cozy pink slippers, designed for ultimate comfort and relaxation at home", "10")
+        sweater= Item("A pink sweater", "A cozy pink sweater, perfect for staying warm on chilly days","15",10)
+        turtleneck= Item("A blue turtleneck", "A stylish blue turtleneck that adds elegance to your winter wardrobe.","18",10)
+        jumper= Item("A Christmas jumper", "A festive Christmas sweater featuring cheerful holiday patterns","20",10)
+        sweatshirt= Item("A white sweatshirt", "A casual white sweatshirt, ideal for a relaxed and sporty look","12",10)
+        coat = Item("A black coat", "A classic black coat, perfect for formal and casual winter outings", "25",10)
+        puffer = Item("A green puffer jacket", "A warm green puffer jacket, ideal for chilly weather", "30",10)
+        trench = Item("A beige trench coat", "A timeless beige trench coat for a sophisticated winter look", "35",10)
+        fur_coat = Item("A brown fur coat", "A luxurious brown fur coat that combines style and warmth", "40",10)
+        shirt = Item("A blue shirt", "A classic blue shirt, versatile for both formal and casual occasions", "14",10)        
+        tshirt = Item("A mauve round-neck T-shirt", "A comfortable mauve T-shirt with a round neck, perfect for layering", "10",10)
+        bandeau = Item("A red bandeau", "A vibrant red bandeau that adds a chic touch to your outfit", "8",10)
+        croptop = Item("A pastel yellow crop top", "A trendy pastel yellow crop top, great for pairing with high-waisted pants", "12",10)
+        jeans = Item("A blue baggy jean", "A relaxed-fit blue baggy jean for a laid-back and stylish look", "20",10)
+        pants = Item("A black straight-leg pant", "A sleek black straight-leg pant, ideal for a professional or casual style", "18",10)
+        shorts = Item("A bottle-green short", "A bottle-green short, perfect for a chic and comfortable summer look", "12",10)
+        skirt = Item("A caramel skirt", "A caramel-colored skirt that exudes elegance and sophistication", "15",10)
+        watch = Item("A gold watch", "A luxurious gold watch that complements any outfit with a touch of class", "40",10)
+        earrings = Item("A pair of gold earrings", "Elegant gold earrings, perfect for adding sparkle to your look", "25",10)
+        necklace = Item("A silver necklace", "A delicate silver necklace, a timeless piece for any occasion", "20",10)
+        ring = Item("A gold ring", "A chic gold ring that adds a subtle but striking detail to your style", "18",10)
+        scarf1 = Item("A grey scarf", "A soft grey scarf to keep you cozy and stylish in cold weather", "10",10)
+        gloves = Item("Black gloves", "Classic black gloves that combine warmth and sophistication", "8",10)
+        beanie = Item("A red beanie", "A warm and vibrant red beanie, perfect for chilly winter days", "6",10)
+        scarf2 = Item("A khaki scarf", "A lightweight khaki scarf that adds a touch of elegance to your outfit", "9",10)
+        square_sunglasses = Item("Black square sunglasses", "Stylish black square sunglasses that offer both sun protection and flair", "12",10)
+        leopard_sunglasses = Item("Leopard rectangular sunglasses", "Trendy leopard-print rectangular sunglasses for a bold statement", "15",10)
+        oversized_sunglasses = Item("Oversized sunglasses", "Chic oversized sunglasses that provide full coverage and timeless elegance", "18",10)
+        heels = Item("Black heels", "Sophisticated black heels, perfect for formal events or nights out", "25",10)
+        boots = Item("Brown boots", "Durable brown boots, ideal for keeping your feet warm and stylish", "30",10)
+        sneakers = Item("White sneakers", "Comfortable and versatile white sneakers, perfect for any casual outfit", "20",10)
+        slippers = Item("Pink slippers", "Cozy pink slippers, designed for ultimate comfort and relaxation at home", "10",10)
 # Add items
         def add_items_to_room(room, items):
             """
@@ -172,41 +173,3 @@ class Game :
         # Setup characters
         cashier = Character("Cashier", "The person handling payments.", checkout )
         Sales_Assistant= Character("Sales Assistant","The person who helps customers find products or provides assistance.", hall_entry)
-
-"""
-import time
-
-class Game:
-    def __init__(self):
-        self.start_time = time.time()
-        self.time_limit = 600  # 10 minutes in seconds
-
-    def check_time(self):
-        elapsed_time = time.time() - self.start_time
-        remaining_time = self.time_limit - elapsed_time
-        if remaining_time <= 0:
-            self.finished = True
-            return "Time's up! You couldn't complete your shopping in time. Game Over!"
-        return f"Time remaining: {int(remaining_time)} seconds."
-    import random
-
-def random_event(player):
-    events = [
-        "discount", 
-        "bonus", 
-        "lost_item"
-    ]
-    event = random.choice(events)
-    if event == "discount":
-        return "Special Event: Discounts! All items in this section are now 50% off."
-    elif event == "bonus":
-        player.gift_card += 10
-        return "Lucky Event: You found a bonus voucher worth 10€!"
-    elif event == "lost_item" and player.cart:
-        lost_item = random.choice(list(player.cart.keys()))
-        del player.cart[lost_item]
-        return f"Unfortunate Event: You lost '{lost_item}' from your cart."
-    return "No events at this time."
-    
-    
-    """
