@@ -11,7 +11,8 @@ def main():
     # Create a game object and play the game
     game = Game()
     game.setup()
-        
+    actions=Actions()
+    actions.play(game.player, game)
 
 if __name__ == "__main__":
     main()

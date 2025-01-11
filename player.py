@@ -1,5 +1,4 @@
 #Define the Player class
-import random
 class Player(): 
     """
     This class represent the player of the game.
@@ -30,7 +29,7 @@ class Player():
         self.height = height
         self.style = style
         self.total = 0
-        self.gift_card=random.randit(50,200) # Gift card value will be assigned later
+        self.gift_card=0 # Gift card value will be assigned later
         self.cart= {} # Initialize an empty list to hold the player's inventory
         self.current_room= None #By default, the player has no room assigned
         self.room_history= [] # Stack to track the history of visited rooms
@@ -56,7 +55,7 @@ class Player():
         else:
             return f"There is no exit to the {direction}."
 
-    def add_item(self,item : str, price : int):
+    def add_item(self,item, price, quantity):
         """
     Adds item with thir price to cadi. 
     
@@ -66,8 +65,11 @@ class Player():
 """
 
         # Add or update the item in the cadi dictionary
-        self.cart.update({item:price}) # Using update to add the item and its price
-        self.total += price
+        if self.name in self.cart:
+            self.cart[self.name][1] += quantity  # Increment quantity
+        else:
+            self.cart[self.name] = [int(price), quantity]
+        self.total += int(price) * quantity
         return f"{item} is added to your cart for {price}."
 
     def show_cart(self):
@@ -76,7 +78,7 @@ class Player():
 
     Returns : A summary of the items.
         """
-        if not self.cadi: 
+        if not self.cart: 
             return "Your cart is empty."
         all_items = "Items in your cart:\n"
         for items in self.cart.keys():
@@ -88,7 +90,6 @@ class Player():
         """
         import random  # Ensure the random module is imported
         self.gift_card=random.randint(50,300)
-
 
 
 
