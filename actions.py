@@ -1,15 +1,11 @@
-# Description: The actions module.
-
-# The actions module contains the functions that are called when a command is executed.
-
 from character import Character
 from room import Room
+from Item import Item
 import random
-
 import threading
-import time 
+import time
 
-class Actions: 
+class Actions:
     """
     A class that defines all the possible actions a player can take in the game.
     """
@@ -23,12 +19,8 @@ class Actions:
             player (Player): The player object.
             game (Game): The game object, which contains the game world.
         """
-        # Reset the game
-        #
-        # game.setup()
-
-        #Start the timer 
-        timer_thread = threading.Thread(target=Actions.start_timer, args=(300,))  # 5 minutes timer
+        # Start the timer
+        timer_thread = threading.Thread(target=self.start_timer, args=(300, player, game))  # 5 minutes timer
         timer_thread.daemon = True  # Ensures the timer ends with the main program
         timer_thread.start()
 
@@ -50,186 +42,225 @@ class Actions:
         """
         command_parts = command_string.split()
         command_word = command_parts[0]
-        if commad_word in ("inventory", "i"):
+        if command_word in ("inventory", "i"):
             self.inventory(player, game, command_parts[1:])
         if command_word in game.commands:
             game.commands[command_word].action(player, game, command_parts[1:])
         else:
             print(f"Command '{command_word}' not recognized. Type 'help' for available commands.")
 
-    #define the move method 
-    def move(player, direction):
-            """
+    def move(self, player, game, args):
+        """
         Checks if the direction chosen by the player exists in the current room's exits.
         If it does, changes the player's current room to the next room in that direction
         and returns a description of the new room. If the direction is invalid, returns
         an error message.
 
-        Parameters:
-            direction (str): The direction in which the player wants to move.
-
-        Returns:
-            str: A description of the new room if the move is successful, or an error message.
+        Args:
+            player (Player): The player object.
+            game (Game): The game object.
+            args (list): The arguments passed with the command.
         """
-            if direction in player.current_room.exits:
-                player.current_room = player.current_room.exits[direction]
-                return f"You move {direction}. {player.current_room.description}"
-            return f"There is no exit to the {direction}."
-
-    def take(player,game,args): 
-            """
-
-    Allows the player to take an item from the room.
-
-    Args:
-        player (Player): The player object.
-        game (Game): The current game instance.
-        args (list): The arguments passed with the command (e.g., item name).
-
-    Returns:
-        None
-    """
-            if not args:
-                print("You must specify an item to take.")
-                return
-
-    # Combine all arguments into a single item name
-            item_name = " ".join(args).strip().lower()  # Normalize and strip whitespace
-            current_room = player.current_room
-
-    # Ensure the room has items
-            if not current_room.items:
-                return
-
-
-    # Search for the item in the current room
-            for item in current_room.items:
-                if item.name.strip().lower() == item_name:  # Ensure names are stripped and normalized
-                    player.add_item(item.name,item.price,)  # Add item to player's cart
-                    print(f"You have taken the {item.name}.")
-                    return
-
-    # If no match is found
-            print(f"The item '{item_name}' is not in this room.")
-
-    # If no match is found
-           
-            print(f"The item '{item_name}' is not in this room.")
-
-    #if the player took the item
-
-            if item in player.current_room.inventory:
-                discounted_price=item.discounted_price()
-                player.cart[item.name]=discounted_price
-                player.total=player.total+discounted_price
-                player.current_room.inventory.remove(item) # Retire l'objet de la pièce
-                player.add_item(item.name, item.price)
-                self.total += item.price   # Update the total cost of items in the cart
-                return f"you have taken the {item.name}.Price: {[discounted_price].euros. TOtal: player.total}euros"
-
-    def look(player, game, args):
-            """
-        Displays the items in the current room.
-        """
-            current_room = player.current_room
-
-    # Check if there are items in the room
-            if not current_room.items:
-                print("This room does not contain any items.")
-            else:
-                print("You see the following items:")
-            for item in current_room.items:
-                print(f"   - {item.name}: {item.description}")
-    
-    def go(player, game, args):
-                """
-        Moves the player in a specified direction.
-        """
-        
-        directions= { 
+        directions = {
             "N": "N", "NORTH": "N", "North": "N", "north": "N",
             "E": "E", "EAST": "E", "East": "E", "east": "E",
             "S": "S", "SOUTH": "S", "South": "S", "south": "S",
             "W": "W", "WEST": "W", "West": "W", "west": "W", "w": "W"
-            }
+        }
         if not args:
             print("You need to specify a direction.")
             return
 
+        direction = directions.get(args[0].upper())
+        if not direction:
+            print("Invalid direction. Please choose N, E, S, or W.")
+            return
 
+        if direction in player.current_room.exits:
+            player.current_room = player.current_room.exits[direction]
+            print(f"You move {direction}. {player.current_room.description}")
+        else:
+            print(f"There is no exit to the {direction}.")
+
+    def take(self, player, game, args):
+        """
+        Allows the player to take an item from the room, applying discounts if applicable.
+        """
+        if not args:
+            print("You must specify an item to take.")
+            return
+
+        item_name = " ".join(args).strip().lower()
+        current_room = player.current_room
+
+        if not current_room.items:
+            print("There are no items in this room.")
+            return
+
+        for item in current_room.items:
+            if isinstance(item, Item) and item.name.strip().lower() == item_name:
+                if item.quantity > 0:
+                    discounted_price = item.price * (1 - item.discount / 100) if hasattr(item, 'discount') else item.price
+                    if item.name in player.cart:
+                        player.cart[item.name] = (player.cart[item.name][0] + 1, discounted_price)
+                    else:
+                        player.cart[item.name] = (1, discounted_price)
+
+                    item.quantity -= 1
+                    player.total += discounted_price
+                    print(f"You have taken the {item.name} at {discounted_price:.2f}€ (discount applied).")
+                    return
+
+        print(f"The item '{item_name}' is not in this room or is out of stock.")
+
+    def look(self, player, game, args):
+        """
+        Displays the items in the current room, including discounts if applicable.
+        """
+        current_room = player.current_room
+
+        if not current_room.items:
+            print("This room does not contain any items.")
+        else:
+            print("You see the following items:")
+            for item in current_room.items:
+                discount_info = f" (Discount: {item.discount}%)" if hasattr(item, 'discount') and item.discount > 0 else ""
+                print(f"   - {item.name}: {item.description}, Quantity: {item.quantity}, Price: {item.price}€{discount_info}")
+
+    def go(self, player, game, args):
+        """
+    Moves the player in a specified direction.
+
+    Args:
+        player (Player): The player object.
+        game (Game): The game object.
+        args (list): The arguments passed with the command, expected to include a direction.
+
+    Behavior:
+        - Checks if the direction is valid and if an exit exists in that direction.
+        - Moves the player to the next room if possible.
+        - Displays the new room's details or an error message if the move fails.
+    """
+    # Check if a direction is provided
+        directions = {"N": "N", "NORTH": "N", "North": "N", "north": "N",
+                "E": "E", "EAST": "E", "East": "E", "east": "E",
+                "S": "S", "SOUTH": "S", "South": "S", "south": "S",
+                "W": "W", "WEST": "W", "West": "W", "west": "W"
+    }
+        if not args:
+            print("You need to specify a direction to go.")
+            return
+
+    # Get the next room
         direction = args[0].upper()  # Extract the direction
         direction=directions.get(direction) #extract the values of the dictionnary
         current_room = player.current_room
-        next_room = current_room.get_exit(direction)
+        next_room = current_room.get_exit(direction)        
         if next_room:
+        # Update the player's location
+            player.room_history.append(player.current_room)  # Keep track of room history for 'back' functionality
             player.current_room = next_room
-            player.room_history.append(current_room)
-            print(f"You moved to {next_room.name}.")
-            print(next_room.get_long_description())
-            print(f"Room history: {[room.name for room in player.room_history]}")
+            print(f"You move {direction}.")
+            print(next_room.get_long_description())  # Display the details of the new room
         else:
-            print("You cannot go in that direction.")
+            print(f"There is no exit to the {direction}.")
 
-    def back(player, game, args):
-            """
-        Allows the player to go to the previous room.
 
-        Args: 
-            player (Player) : the player object.
-            direction (str): The direction in which the player wants to move.
 
-        Returns : 
-            str : the player going to the previous room 
+    def back(self, player, game, args):
         """
-            if player.room_history:
-                previous_room = player.room_history.pop()
-                player.current_room=previous_room
-                player.current_room=previous_room
-                print(f"You go back. You are now in {previous_room.name}.")  # Use f-string for dynamic room name
-                print(f"Room history: {[room.name for room in player.room_history]}")
-            else :
-                print ("You can't go back. There is no previous room in your history.")
+        Allows the player to go to the previous room.
+        """
+        if player.room_history:
+            previous_room = player.room_history.pop()
+            player.current_room = previous_room
+            print(f"You go back. You are now in {previous_room.name}.")
+        else:
+            print("You can't go back. There is no previous room in your history.")
 
-    def drop(player, game, args):
-            """
-        Allows the player to drop an item from the cart.
+    def drop(self, player, game, args):
+        """
+    Allows the player to drop an item from the cart.
+
+    Args:
+        player (Player): The player object.
+        game (Game): The game instance containing the game state.
+        args (list): The arguments passed with the command, expected to include the item name.
+
+    Behavior:
+        - Removes the specified item from the cart if it exists.
+        - Updates the room's inventory.
+        - Displays a message if the item is not found in the cart.
+    """
+    # Check if the player specified an item
+        if not args:
+            print("You must specify an item to drop.")
+            return
+
+    # Combine the arguments into the full item name
+        item_name = " ".join(args).strip().lower()
+
+    # Check if the item is in the cart
+        found_item = None
+        for cart_item_name in player.cart.keys():
+            if cart_item_name.strip().lower() == item_name:
+                found_item = cart_item_name
+                break
+
+        if not found_item:
+            print(f"The item '{item_name}' is not in your cart.")
+            return
+
+    # Remove the item from the cart
+        quantity, price = player.cart[found_item]
+        if quantity > 1:
+            player.cart[found_item] = (quantity - 1, price)
+        else:
+            del player.cart[found_item]
+
+        player.total -= price
+
+    # Return the item to the room
+        for item in player.current_room.items:
+            if item.name.strip().lower() == item_name:
+                item.quantity += 1
+                print(f"You have dropped the '{item.name}'. It has been returned to the room.")
+                return
+
+        print(f"The item '{item_name}' has been removed from your cart but could not be returned to the room.")
+
+    def start_timer(self, duration, player, game):
+        """
+        Starts a countdown timer for the game.
+
+        Args:
+            duration (int): The duration of the timer in seconds.
+        """
+        time.sleep(duration)
+        Actions.timer_expired = True
+        print("Time's up! Game Over.")
+        game.finished = True
+
+    def help(self, player, game, args):
+        """
+        Displays a detailed list of available commands, including their descriptions and usage.
 
         Args:
             player (Player): The player object.
-            game (Game): The current game instance.
-            args (list): The arguments passed with the command (e.g., item name).
+            game (Game): The game instance containing all commands.
+            args (list): The arguments passed with the command (unused).
+        """
+        print("Available commands:")
+        print("-------------------")
+        print("play: Start or restart the game.")
+        print("move <direction>: Move in a specific direction (e.g., N, E, S, W).")
+        print("take <item>: Pick up an item from the current room.")
+        print("drop <item>: Drop an item from your cart into the room.")
+        print("look: View the items in the current room.")
+        print("go <direction>: Move to another")
 
-        Returns:
-            None
-    """
-            if not args:
-                print("You must specify an item to drop.")
-                return
-
-        # Combine all arguments into a single item name
-            item_name = " ".join(args).strip()
-            print(f"Attempting to drop '{item_name}' from cart.")
-
-    
-    # Check if the item exists in the cart
-            if item_name in player.cart:
-                item_price = player.cart[item_name]
-                del player.cart[item_name]
-                player.total -= item_price
-                print(f"You have dropped the {item_name}.")
-            else:
-                print(f"{item_name} is not in your cart.") 
-
-    #ajout du timer 
-
-    def start_timer(duration):
-        global timer_expired
-        time.sleep(duration)
-        Actions.timer_expired = True
-        print("\nTime's up! Your shopping adventure has ended. Let's see how you did.\n")
-
-    def buy(player,game,args):
-            """ 
+    def buy(self,player,game,args):
+        """ 
         Finalizes the game and checks whether the player exceeded the gift card or not.
 
         Args: 
@@ -238,30 +269,30 @@ class Actions:
         Returns: 
             A message indicating whether the player succeded or failed. 
         """
-            if Actions.timer_expired:
-                return ("Time's up! Your shopping adventure has ended. "
-                        f"Cart total: {player.total}€\n"
-                        f"Gift card value: {player.gift_card}€\n"
-                        f"Remaining credit: {player.gift_card - player.total}€.\n"
-                        "Thanks for playing!")
-            if not isinstance(player.gift_card, (int, float)):
-                player.gift_card = player.gift_card[0] if isinstance(player.gift_card, tuple) else 0  # Fix tuple issue
-            remaining_credit = player.gift_card - player.total
-            if player.total > player.gift_card :
-                print (f"Game Over! Your cart total is {player.total}€, "
-                    f"but your gift card is only {player.gift_card}€. "
-                    "You exceeded your budget!")
-            else : 
-                print (f"Congratulations! You successfully completed your shopping without exceeding the random gift card.\n"
+        if Actions.timer_expired:
+            return ("Time's up! Your shopping adventure has ended. "
                     f"Cart total: {player.total}€\n"
                     f"Gift card value: {player.gift_card}€\n"
-                    f"Remaining credit: {remaining_credit}€\n"
-                    f"Thanks for playing See you next time!")
-            game.finished=True
+                    f"Remaining credit: {player.gift_card - player.total}€.\n"
+                    "Thanks for playing!")
+        if not isinstance(player.gift_card, (int, float)):
+            player.gift_card = player.gift_card[0] if isinstance(player.gift_card, tuple) else 0  # Fix tuple issue
+        remaining_credit = player.gift_card - player.total
+        if player.total > player.gift_card :
+            print (f"Game Over! Your cart total is {player.total}€, "
+                f"but your gift card is only {player.gift_card}€. "
+                "You exceeded your budget!")
+        else : 
+            print (f"Congratulations! You successfully completed your shopping without exceeding the random gift card.\n"
+                f"Cart total: {player.total}€\n"
+                f"Gift card value: {player.gift_card}€\n"
+                f"Remaining credit: {remaining_credit}€\n"
+                f"Thanks for playing See you next time!")
+        game.finished=True
             ####
 
-    def receipt(player,game,args):
-            """
+    def receipt(self,player,game,args):
+        """
         Displays a detailed summary of the player's cart without finalizing the purchase.
 
         Args:
@@ -271,47 +302,24 @@ class Actions:
             str: A detailed receipt of the cart's contents and the total cost.
         """
         # Check if the cart is empty
-            if not player.cart:
-                print ("Your cart is empty. Add some items before viewing the receipt!")
+        if not player.cart:
+            print ("Your cart is empty. Add some items before viewing the receipt!")
 
     # Build the receipt string
-            receipt = "----- Receipt -----\n"
-            for item_name, price in player.cart.items():
-                receipt += f"{item_name}: {price}€\n"
-            receipt += "-------------------\n"
-            receipt += f"Cart Total: {player.total}€\n"
-            receipt += "-------------------\n"
-            print(receipt)        
+        receipt = "----- Receipt -----\n"
+        for item_name, price in player.cart.items():
+            receipt += f"{item_name}: {price}€\n"
+        receipt += "-------------------\n"
+        receipt += f"Cart Total: {player.total}€\n"
+        receipt += "-------------------\n"
+        print(receipt)        
         
+    def quit(self,player,game,args):
+        """
+        Exists the game.
 
-
-
-
-    def help():
-                """
-        Displays a list of available commands.
-
-        Returns: 
-            str: A help message listing all available commands.
-            """
-                return ("Available commands:\n"
-                    "- stplayart : starts the game.\n"
-                    "- move <direction>: Move in a specific direction.\n"
-                    "- take <item>: Take an item from the room.\n"
-                    "- drop <item>: Drop an item from your cart.\n"
-                    "- look: Look around the room.\n"
-                    "- go <direction>: Move to another room.\n"
-                    "- back: Go back to the previous room.\n"
-                    "- buy: Finalize your shopping.\n"
-                    "- quit: Exit the game.")
-
-
-    def quit(player,game,number_of_arguments):
-            """
-    Exists the game.
-
-    Returns:
-        str: A farewall message.
-    """
-            game.finished=True
-            print("Thanks for playing! Goodbye!") 
+        Returns:
+            str: A farewall message.
+        """
+        game.finished=True
+        print("Thanks for playing! Goodbye!") 
