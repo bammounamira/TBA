@@ -87,10 +87,10 @@ class Player():
 
     def assign_gift_card(self):
         """
-    Assigns a random gift card value between 50 and 300 to the player.
+    Assigns a random gift card value between 50 and 200 to the player.
         """
         import random  # Ensure the random module is imported
-        self.gift_card=random.randint(50,300)
+        self.gift_card=random.randint(50,200)
 
 
 
