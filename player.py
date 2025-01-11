@@ -1,4 +1,5 @@
 #Define the Player class
+import random
 class Player(): 
     """
     This class represent the player of the game.
@@ -29,7 +30,7 @@ class Player():
         self.height = height
         self.style = style
         self.total = 0
-        self.gift_card=0 # Gift card value will be assigned later
+        self.gift_card=random.randint(50,200) # Gift card value will be assigned later
         self.cart= {} # Initialize an empty list to hold the player's inventory
         self.current_room= None #By default, the player has no room assigned
         self.room_history= [] # Stack to track the history of visited rooms
