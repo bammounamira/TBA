@@ -173,3 +173,41 @@ class Game :
         # Setup characters
         cashier = Character("Cashier", "The person handling payments.", checkout )
         Sales_Assistant= Character("Sales Assistant","The person who helps customers find products or provides assistance.", hall_entry)
+
+"""
+import time
+
+class Game:
+    def __init__(self):
+        self.start_time = time.time()
+        self.time_limit = 600  # 10 minutes in seconds
+
+    def check_time(self):
+        elapsed_time = time.time() - self.start_time
+        remaining_time = self.time_limit - elapsed_time
+        if remaining_time <= 0:
+            self.finished = True
+            return "Time's up! You couldn't complete your shopping in time. Game Over!"
+        return f"Time remaining: {int(remaining_time)} seconds."
+    import random
+
+def random_event(player):
+    events = [
+        "discount", 
+        "bonus", 
+        "lost_item"
+    ]
+    event = random.choice(events)
+    if event == "discount":
+        return "Special Event: Discounts! All items in this section are now 50% off."
+    elif event == "bonus":
+        player.gift_card += 10
+        return "Lucky Event: You found a bonus voucher worth 10€!"
+    elif event == "lost_item" and player.cart:
+        lost_item = random.choice(list(player.cart.keys()))
+        del player.cart[lost_item]
+        return f"Unfortunate Event: You lost '{lost_item}' from your cart."
+    return "No events at this time."
+    
+    
+    """

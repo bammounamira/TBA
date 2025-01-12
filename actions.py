@@ -30,6 +30,9 @@ class Actions:
         print(f"Explore the store, pick items you love, but stay within your budget!")
         print(player.current_room.get_long_description())
 
+        # Introduce pnjs in the current room
+        self.introduce_character(player.current_room)
+
         # Game loop
         while not game.finished:
             command = input("> ").strip()
@@ -44,13 +47,18 @@ class Actions:
         command_word = command_parts[0]
         if command_word in ("inventory", "i"):
             self.inventory(player, game, command_parts[1:])
-        if command_word in game.commands:
+        elif command_word == "talk":
+            self.talk(player, game, command_parts[1:])
+        elif command_word in game.commands:
             game.commands[command_word].action(player, game, command_parts[1:])
         else:
             print(f"Command '{command_word}' not recognized. Type 'help' for available commands.")
 
-    def move(self, player, game, args):
-        """
+    
+
+    #define the move method 
+    def move(player, direction):
+            """
         Checks if the direction chosen by the player exists in the current room's exits.
         If it does, changes the player's current room to the next room in that direction
         and returns a description of the new room. If the direction is invalid, returns
