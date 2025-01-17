@@ -1,49 +1,63 @@
-#Define the Player class
+"""
+This module defines the Player class, which represents the player in the game.
+
+The Player class includes attributes and methods to manage the player's
+characteristics, current location, cart, and interactions with the game world.
+"""
+
 import random
-class Player(): 
+
+
+class Player:
     """
-    This class represent the player of the game.
+    Represents the player of the game.
 
     Attributes:
-    name (str): The name chosen by the player.
-    hair (str): The hair color or style of the player.
-    eyes (str): The eye color of the player.
-    height (int): The height of the player in centimeters.
-    style (str): The clothing style or appearance of the player.
-    current_room (Room): The current room where the player is.
-    cart (str) : the list of items the player has collected. A dictionary where keys are items and values are their prices.
-    gift_card (str): the total value of the player's gift card. 
-    
+        personal_info (dict): Dictionary containing personal
+        attributes like name, hair, eyes, and height.
+        style (str): The clothing style or appearance of the player.
+        current_room (Room): The current room where the player is.
+        cart (dict): The list of items the player has collected.
+        Keys are items, values are [price, quantity].
+        gift_card (int): The total value of the player's gift card.
+        room_history (list): A stack to track the history of visited rooms.
 
     Methods:
-        __init__ : Constructor of the class
-        Checks if the direction chosen by the player exists 
-        in the current room's exits. If it does, changes the
-        player's current room to the next room in that direction 
-        and returns a description of the new room.
-"""
-#Define the constructor
-    def __init__(self, name, hair, eyes, height, style, cart, total, gift_card, current_room, room_history):
-        self.name = name
-        self.hair = hair
-        self.eyes = eyes
-        self.height = height
-        self.style = style
-        self.total = 0
-        self.gift_card=random.randint(50,200) # Gift card value will be assigned later
-        self.cart= {} # Initialize an empty list to hold the player's inventory
-        self.current_room= None #By default, the player has no room assigned
-        self.room_history= [] # Stack to track the history of visited rooms
-    
-    #define the move method 
-    def move(self, direction):
-        """
-        Checks if the direction chosen by the player exists in the current room's exits.
-        If it does, changes the player's current room to the next room in that direction
-        and returns a description of the new room. If the direction is invalid, returns
-        an error message.
+        move(direction):
+            Moves the player to the next room if the direction is valid.
+        add_item(item, price, quantity):
+            Adds an item with its price and quantity to the player's cart.
+        show_cart():
+            Displays the items in the player's cart.
+        assign_gift_card():
+            Assigns a random gift card value between 50 and 200 to the player.
+    """
 
-        Parameters:
+    def __init__(self,name: str, height: str, eyes: str, hair: str,style: str, current_room=None):
+        """
+        Initializes the Player instance.
+
+        Args:
+            name (str): The name of the player.
+            hair (str): The hair color or style of the player.
+            eyes (str): The eye color of the player.
+            height (int): The height of the player in centimeters.
+            style (str): The clothing style or appearance of the player.
+            current_room (Room, optional): The initial room where the player starts.
+            Defaults to None.
+        """
+        self.personal_info = {"name": name, "hair": hair, "eyes": eyes, "height": height}
+        self.style = style
+        self.cart = {}
+        self.gift_card = random.randint(50, 200)
+        self.current_room = current_room
+        self.room_history = []
+
+    def move(self, direction: str) -> str:
+        """
+        Moves the player in the specified direction if it exists.
+
+        Args:
             direction (str): The direction in which the player wants to move.
 
         Returns:
@@ -51,50 +65,46 @@ class Player():
         """
         if direction in self.current_room.exits:
             next_room = self.current_room.exits[direction]
+            self.room_history.append(self.current_room)
             self.current_room = next_room
             return f"You move {direction}. {next_room.description}"
+        return f"There is no exit to the {direction}."
+
+    def add_item(self, item: str, price: int, quantity: int) -> str:
+        """
+        Adds an item with its price and quantity to the player's cart.
+
+        Args:
+            item (str): The item to add.
+            price (int): The price of the item.
+            quantity (int): The quantity of the item.
+
+        Returns:
+            str: Confirmation that the item has been added to the cart.
+        """
+        if item in self.cart:
+            self.cart[item][1] += quantity
         else:
-            return f"There is no exit to the {direction}."
+            self.cart[item] = [price, quantity]
+        return f"{item} has been added to your cart for ${price} each (x{quantity})."
 
-    def add_item(self,item, price, quantity):
+    def show_cart(self) -> str:
         """
-    Adds item with thir price to cadi. 
-    
-    Parameters :
-    item(str) : every item that the player selected 
-    price(int) : the price of every item selected 
-"""
+        Displays the items in the player's cart.
 
-        # Add or update the item in the cadi dictionary
-        if self.name in self.cart:
-            self.cart[self.name][1] += quantity  # Increment quantity
-        else:
-            self.cart[self.name] = [int(price), quantity]
-        self.total += int(price) * quantity
-        return f"{item} is added to your cart for {price}."
-
-    def show_cart(self):
+        Returns:
+            str: A summary of the items in the cart, or a message if the cart is empty.
         """
-    Displays the item in the player's cadi 
-
-    Returns : A summary of the items.
-        """
-        if not self.cart: 
+        if not self.cart:
             return "Your cart is empty."
+
         all_items = "Items in your cart:\n"
-        for items in self.cart.keys():
-            return all_items 
+        for item, (price, quantity) in self.cart.items():
+            all_items += f"  - {item}: ${price} x {quantity}\n"
+        return all_items
 
     def assign_gift_card(self):
         """
-    Assigns a random gift card value between 50 and 200 to the player.
+        Assigns a random gift card value between 50 and 200 to the player.
         """
-        import random  # Ensure the random module is imported
-        self.gift_card=random.randint(50,200)
-
-
-
-
-
-
-
+        self.gift_card = random.randint(50, 200)
