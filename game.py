@@ -1,8 +1,8 @@
 """
-Ce module contient la classe Game qui configure et gère le jeu.
+This module contains the Game class that configures and manages the game.
 
-La classe Game initialise les commandes, les salles, les objets, les personnages,
-et permet à un joueur d'interagir avec l'environnement du jeu.
+The Game class initializes commands, rooms, items, characters,
+and allows a player to interact with the game's environment.
 """
 import random
 from room import Room
@@ -24,6 +24,20 @@ class Game :
         actions (Actions) : Actions disponibles dans le jeu.
     """
     def __init__(self):
+        """
+    Initializes the Game class.
+
+    This constructor sets up the foundational attributes required to manage the 
+    game's state, player interactions, available commands, and game world.
+
+    Attributes:
+        finished: Indicates whether the game has ended. Defaults to False.
+        rooms: An empty list to hold Room objects.
+        commands: An empty dictionary to map command names to their respective Command objects.
+        player: Represents the player in the game.
+        direction_ensemble: A set to store valid movement directions.
+        actions: An instance of the Actions class, which contains methods that will be used.
+        """
         self.finished = False
         self.rooms = []
         self.commands = {}
@@ -32,7 +46,7 @@ class Game :
         self.actions = Actions()
 
     def setup(self):
-
+        """Initializes the game commands."""
         self.commands = {
             "help" : Command(
                 "help", " : Display a list of available commands.",
@@ -49,9 +63,9 @@ class Game :
                 self.actions.back, 0,"Returns to the previous room you visited."),
             "look" : Command(
                 "look", " : View the inventory of items in the current section.",
-                self.actions.look, 0,"Adds an item to your cart from the current room."),
-            "take" : Command(
-                "take", " <item> : Pick up an item from the current section.",
+                self.actions.look, 0,"Shows the items in the current_room."),
+            "take" : Command( 
+                "take"," <item> : Pick up an item from the current section.",
                 self.actions.take, 1, "Adds an item to your cart from the current room."),
             "drop" : Command(
                 "drop", " <item> : Return an item to the current section.",
@@ -70,45 +84,173 @@ class Game :
                 "talk"," : Talk to a character in the current room.",
                 self.actions.talk,1,
                 "Talk to a character in the room to get information or interact.")}
-
-        hall_entry = Room("hall entry", "The welcoming entrance of the hall, adorned with elegant decor and a grand chandelier.","Asistant_sales", items=set(), exits={}
+        self._setup_rooms()
+        self._setup_items()
+        self._setup_characters()
+        self._setup_player()
+    def _setup_rooms(self):
+        """Creates and connects the game rooms."""
+        hall_entry=Room(
+            "hall entry",
+            "The welcoming entrance of the hall.",
+            "Asistant",
+            exits={}
         )
+        hall_entry.items = set()
         self.rooms.append(hall_entry)
-        hall_center = Room("hall center", "The heart of the hall, filled with mannequins showcasing winter novelties.","Asistant_sales", items=set() , exits={}
+        hall_center = Room(
+            "hall center",
+            "The heart of the hall, filled with mannequins showcasing winter novelties.",
+            "Asistant",
+            exits={}
         )
+        hall_center.items = set()
         self.rooms.append(hall_center)
-        hall_exit = Room("hall exit", "The final part of the hall, leading to the rest of the store. Displays elegant accessories.","Asistant_sales", items=set() , exits={}
+        hall_exit = Room(
+            "hall exit",
+            "The final part of the hall, leading to the rest of the store.",
+            "Asistant",
+            exits={}
         )
+        hall_exit.items = set()
         self.rooms.append(hall_exit)
-        sweaters_section = Room("Sweaters Section", "A cozy section filled with winter sweaters and warm cardigans.",None,items=set(),exits={}
+        sweaters_section = Room(
+            "Sweaters Section",
+            "A cozy section filled with winter sweaters and warm cardigans.",
+            None,
+            exits={}
         )
+        sweaters_section.items = set()
         self.rooms.append(sweaters_section)
-        coats_section = Room("Coats Section", "Discover a variety of winter coats, from elegant wool designs to trendy puffer jackets.",None,items=set(),exits={}
+        coats_section = Room(
+            "Coats Section",
+            "Discover a variety of winter coats,from wool designs to puffer jackets.",
+            None,
+            exits={}
         )
+        coats_section.items = set()
         self.rooms.append(coats_section)
-        jewelry = Room("Jewelry", "An elegant section showcasing sparkling jewelry pieces perfect for the winter season.",None,items=set(),exits={}
+        jewelry = Room(
+            "Jewelry",
+            "An elegant section showcasing sparkling jewelry pieces perfect for the winter season.",
+            None,
+            exits={}
         )
+        jewelry.items = set()
         self.rooms.append(jewelry)
-        sunglasses_section = Room("Sunglasses Section", "A bright corner featuring sunglasses designed to protect your eyes during snowy days.",None,items=set(),exits={}
+        sunglasses_section = Room(
+            "Sunglasses Section",
+            "A bright corner featuring sunglasses designed to protect your eyes during snowy days.",
+            None,
+            exits={}
         )
+        sunglasses_section.items = set()
         self.rooms.append(sunglasses_section)
-        shoes_section = Room("Shoes Section", "Explore a wide selection of winter boots, stylish heels, and cozy slippers.",None,items=set(),exits={}
+        shoes_section = Room(
+            "Shoes Section",
+            "Explore a wide selection of winter boots, stylish heels, and cozy slippers.",
+            None,
+            exits={}
         )
+        shoes_section.items = set()
         self.rooms.append(shoes_section)
-        bottoms_section = Room("Bottoms Section", "A trendy section featuring a variety of jeans, shorts, and skirts for every winter occasion.",None,items=set(),exits={}
+        bottoms_section = Room("Bottoms Section",
+        "A trendy section featuring a variety of jeans, shorts, and skirts.",
+        None,
+        exits={}
         )
+        bottoms_section.items = set()
         self.rooms.append(bottoms_section)
-        accessories_section = Room("Accessories Section", "A stylish corner showcasing scarves, gloves, hats, and other winter accessories.",None,items=set(),exits={}
+        accessories_section = Room(
+            "Accessories Section",
+            "A stylish corner showcasing scarves, gloves, hats, and other winter accessories.",
+            None,
+            exits={}
         )
+        accessories_section.items = set()
         self.rooms.append(accessories_section)
-        tops_section = Room("Tops Section", "Explore an array of tops, from button-ups and t-shirts to trendy crop tops.",None,items=set(),exits={}
+        tops_section = Room("Tops Section",
+        "Explore an array of tops, from button-ups and t-shirts to trendy crop tops.",
+        None,
+        exits={}
         )
+        tops_section.items = set()
         self.rooms.append(tops_section)
-        checkout = Room("Checkout", "The final stop where customers can review their items and make their purchases.","Cashier",items=set(),exits={}
+        checkout = Room(
+            "Checkout",
+            "The final stop where customers can review their items and make their purchases.",
+            "Cashier",
+            exits={}
         )
+        checkout.items = set()
         self.rooms.append(checkout)
-        Game.rooms=[hall_entry,hall_exit,hall_center, coats_section, sweaters_section, tops_section, jewelry, shoes_section, accessories_section, sunglasses_section, bottoms_section, checkout]
+        self.rooms=[hall_entry,hall_exit,hall_center,
+                    coats_section, sweaters_section, tops_section,
+                    jewelry, shoes_section, accessories_section,
+                    sunglasses_section, bottoms_section, checkout]
+        hall_entry.exits={
+            "N":hall_center,
+            "S": None ,
+            "W":checkout,
+            "E":coats_section}
+        hall_center.exits={
+            "N":hall_exit,
+            "S": hall_entry ,
+            "W":sunglasses_section,
+            "E":sweaters_section}
+        hall_exit.exits={
+            "N":accessories_section,
+            "S": hall_center ,
+            "W":jewelry,
+            "E":bottoms_section}
+        coats_section.exits={
+            "N":sweaters_section,
+            "S": None ,
+            "W": hall_entry ,
+            "E": None}
+        sweaters_section.exits={
+            "N":bottoms_section,
+            "S": coats_section,
+            "W":hall_center ,
+            "E":None}
+        tops_section.exits={
+            "N":None,
+            "S": bottoms_section ,
+            "W":accessories_section ,
+            "E": None}
+        bottoms_section.exits={
+            "N":tops_section,
+            "S": sweaters_section ,
+            "W":hall_exit ,
+            "E": None}
+        sunglasses_section.exits={
+            "N":jewelry,
+            "S": checkout ,
+            "W":shoes_section ,
+            "E": tops_section}
+        accessories_section.exits={
+            "N": None,
+            "S": hall_exit ,
+            "W":shoes_section,
+            "E":tops_section }
+        jewelry.exits={
+            "N":shoes_section,
+            "S": sunglasses_section ,
+            "W":None,
+            "E":hall_exit }
+        shoes_section.exits={
+            "N":None,
+            "S": jewelry,
+            "W":None,
+            "E": accessories_section}
+        checkout.exits={
+            "N":sunglasses_section,
+            "S":None,
+            "W":None,
+            "E":hall_entry}
 
+    def _setup_player(self):
+        """Initializes the player character"""
         self.player = Player(
             name=input("\nEnter your name: "),
             hair=input("\nEnter your hair color: "),
@@ -118,89 +260,213 @@ class Game :
             cart={},
             total=0,
             gift_card=random.randint(50,200),
-            current_room=None,
+            current_room=self.rooms[0],
             room_history=[]
         )
-        self.player.current_room = hall_entry
+        self.player.current_room =self.rooms[0]
 
-        hall_entry.exits={"N":hall_center, "S": None , "W":checkout, "E":coats_section}
-        hall_center.exits={"N":hall_exit, "S": hall_entry , "W":sunglasses_section, "E":sweaters_section}
-        hall_exit.exits={"N":accessories_section, "S": hall_center , "W":jewelry, "E":bottoms_section}
-        coats_section.exits={"N":sweaters_section, "S": None , "W": hall_entry , "E": None}
-        sweaters_section.exits={"N":bottoms_section, "S": coats_section, "W":hall_center , "E":None}
-        tops_section.exits={"N":None, "S": bottoms_section , "W":accessories_section , "E": None}
-        bottoms_section.exits={"N":tops_section, "S": sweaters_section , "W":hall_exit , "E": None}
-        sunglasses_section.exits={"N":jewelry, "S": checkout , "W":shoes_section , "E": tops_section}
-        accessories_section.exits={"N": None, "S": hall_exit , "W":shoes_section, "E":tops_section }
-        jewelry.exits={"N":shoes_section, "S": sunglasses_section , "W":None, "E":hall_exit }
-        shoes_section.exits={"N":None, "S": jewelry,"W":None, "E": accessories_section}
-        checkout.exits={"N":sunglasses_section ,"S":None , "W":None , "E":hall_entry}
-    
+    def _setup_items(self):
+        """Adds items to rooms"""
+        sweaters_items = {
+        Item(
+            "A pink sweater",
+            "A cozy pink sweater, perfect for staying warm on chilly days",
+            "15",
+            10,
+            10),
+        Item(
+            "A blue turtleneck",
+            "A stylish blue turtleneck that adds elegance to your winter wardrobe.",
+            "18",
+            10,
+            10),
+        Item(
+            "A Christmas jumper",
+            "A festive Christmas sweater featuring cheerful holiday patterns",
+            "20",
+            10,
+            10),
+        Item(
+            "A white sweatshirt",
+            "A casual white sweatshirt, ideal for a relaxed and sporty look",
+            "12",
+            10,
+            10)}
+        self.rooms[4].items.update(sweaters_items)
+        coats_items={
+        Item(
+            "A black coat", "A classic black coat, perfect for formal and casual winter outings",
+            "25",
+            5,
+            10),
+        Item(
+            "A green puffer jacket", "A warm green puffer jacket, ideal for chilly weather",
+            "30",
+            5,
+            10),
+        Item(
+            "A beige trench coat", "A timeless beige trench coat for a sophisticated winter look",
+            "35",
+            5,
+            10),
+        Item(
+            "A brown fur coat", "A luxurious brown fur coat that combines style and warmth",
+            "40",
+            5,
+            10)}
+        self.rooms[3].items.update(coats_items)
+        tops_items={
+        Item(
+            "A blue shirt", "A classic blue shirt,for formal and casual occasions",
+            "14",
+            5,
+            10),
+        Item(
+            "A mauve round-neck T-shirt", "A comfortable mauve T-shirt with a round neck",
+            "10",
+            5,
+            10),
+        Item(
+            "A red bandeau", "A vibrant red bandeau",
+            "8",
+            5,
+            10),
+        Item(
+            "A pastel yellow crop top", "A trendy pastel yellow crop top",
+            "12",
+            5,
+            10)}
+        self.rooms[5].items.update(tops_items)
+        bottoms_items={
+        Item(
+            "A blue baggy jean", "A relaxed-fit blue baggy jean for a laid-back look.",
+            "20",
+            5,
+            10),
+        Item(
+            "A black straight-leg pant", "A sleek black straight-leg pant.",
+            "18",
+            5,
+            10),
+        Item(
+            "A bottle-green short", "A bottle-green short,for a comfortable summer look",
+            "12",
+            5,
+            10),
+        Item(
+            "A caramel skirt", "A caramel-colored skirt that exudes elegance",
+            "15",
+            5,
+            10)}
+        self.rooms[10].items.update(bottoms_items)
+        jewelry={
+        Item(
+            "A gold watch", "A luxurious gold watch.",
+            "40",
+            30,
+            10),
+        Item(
+            "A pair of gold earrings", "Elegant gold earrings, perfect for adding sparkle.",
+            "25",
+            30,
+            10),
+        Item(
+            "A silver necklace", "A delicate silver necklace, a timeless piece for any occasion",
+            "20",
+            30,
+            10),
+        Item(
+            "A gold ring", "A chic gold ring that adds a subtle but striking detail to your style",
+            "18",
+            30,
+            10)}
+        self.rooms[6].items.update(jewelry)
+        accessories_items={
+        Item(
+            "A grey scarf", "A soft grey scarf to keep you cozy and stylish in cold weather",
+            "10",
+            30,
+            10),
+        Item(
+            "Black gloves", "Classic black gloves that combine warmth and sophistication",
+            "8",
+            30,
+            10),
+        Item(
+            "A red beanie", "A warm and vibrant red beanie, perfect for chilly winter days",
+            "6",
+            30,
+            10),
+        Item(
+            "A khaki scarf",
+            "A lightweight khaki scarf that adds a touch of elegance to your outfit",
+            "9",
+            30,
+            10)}
+        self.rooms[8].items.update(accessories_items)
+        sunglasses_items={
+        Item(
+            "Black square sunglasses",
+            "Stylish black square sunglasses that offer both sun protection and flair",
+            "12",
+            15,
+            10),
+        Item(
+            "Leopard rectangular sunglasses",
+            "Trendy leopard-print rectangular sunglasses for a bold statement",
+            "15",
+            15,
+            10),
+        Item(
+            "Oversized sunglasses",
+            "Chic oversized sunglasses that provide full coverage and timeless elegance",
+            "18",
+            15,
+            10)}
+        self.rooms[9].items.update(sunglasses_items)
+        shoes_items={
+        Item(
+            "Black heels",
+            "Sophisticated black heels, perfect for formal events or nights out",
+            "25",
+            20,
+            10),
+        Item(
+            "Brown boots",
+            "Durable brown boots, ideal for keeping your feet warm and stylish",
+            "30",
+            20,
+            10),
+        Item(
+            "White sneakers",
+            "Comfortable and versatile white sneakers, perfect for any casual outfit",
+            "20",
+            20,
+            10),
+        Item(
+            "Pink slippers",
+            "Cozy pink slippers, designed for ultimate comfort and relaxation at home",
+            "10",
+            20,
+            10)}
+        self.rooms[7].items.update(shoes_items)
 
-#Setup Items
-        sweater= Item("A pink sweater", "A cozy pink sweater, perfect for staying warm on chilly days","15",10)
-        turtleneck= Item("A blue turtleneck", "A stylish blue turtleneck that adds elegance to your winter wardrobe.","18",10)
-        jumper= Item("A Christmas jumper", "A festive Christmas sweater featuring cheerful holiday patterns","20",10)
-        sweatshirt= Item("A white sweatshirt", "A casual white sweatshirt, ideal for a relaxed and sporty look","12",10)
-        coat = Item("A black coat", "A classic black coat, perfect for formal and casual winter outings", "25",10)
-        puffer = Item("A green puffer jacket", "A warm green puffer jacket, ideal for chilly weather", "30",10)
-        trench = Item("A beige trench coat", "A timeless beige trench coat for a sophisticated winter look", "35",10)
-        fur_coat = Item("A brown fur coat", "A luxurious brown fur coat that combines style and warmth", "40",10)
-        shirt = Item("A blue shirt", "A classic blue shirt, versatile for both formal and casual occasions", "14",10)        
-        tshirt = Item("A mauve round-neck T-shirt", "A comfortable mauve T-shirt with a round neck, perfect for layering", "10",10)
-        bandeau = Item("A red bandeau", "A vibrant red bandeau that adds a chic touch to your outfit", "8",10)
-        croptop = Item("A pastel yellow crop top", "A trendy pastel yellow crop top, great for pairing with high-waisted pants", "12",10)
-        jeans = Item("A blue baggy jean", "A relaxed-fit blue baggy jean for a laid-back and stylish look", "20",10)
-        pants = Item("A black straight-leg pant", "A sleek black straight-leg pant, ideal for a professional or casual style", "18",10)
-        shorts = Item("A bottle-green short", "A bottle-green short, perfect for a chic and comfortable summer look", "12",10)
-        skirt = Item("A caramel skirt", "A caramel-colored skirt that exudes elegance and sophistication", "15",10)
-        watch = Item("A gold watch", "A luxurious gold watch that complements any outfit with a touch of class", "40",10)
-        earrings = Item("A pair of gold earrings", "Elegant gold earrings, perfect for adding sparkle to your look", "25",10)
-        necklace = Item("A silver necklace", "A delicate silver necklace, a timeless piece for any occasion", "20",10)
-        ring = Item("A gold ring", "A chic gold ring that adds a subtle but striking detail to your style", "18",10)
-        scarf1 = Item("A grey scarf", "A soft grey scarf to keep you cozy and stylish in cold weather", "10",10)
-        gloves = Item("Black gloves", "Classic black gloves that combine warmth and sophistication", "8",10)
-        beanie = Item("A red beanie", "A warm and vibrant red beanie, perfect for chilly winter days", "6",10)
-        scarf2 = Item("A khaki scarf", "A lightweight khaki scarf that adds a touch of elegance to your outfit", "9",10)
-        square_sunglasses = Item("Black square sunglasses", "Stylish black square sunglasses that offer both sun protection and flair", "12",10)
-        leopard_sunglasses = Item("Leopard rectangular sunglasses", "Trendy leopard-print rectangular sunglasses for a bold statement", "15",10)
-        oversized_sunglasses = Item("Oversized sunglasses", "Chic oversized sunglasses that provide full coverage and timeless elegance", "18",10)
-        heels = Item("Black heels", "Sophisticated black heels, perfect for formal events or nights out", "25",10)
-        boots = Item("Brown boots", "Durable brown boots, ideal for keeping your feet warm and stylish", "30",10)
-        sneakers = Item("White sneakers", "Comfortable and versatile white sneakers, perfect for any casual outfit", "20",10)
-        slippers = Item("Pink slippers", "Cozy pink slippers, designed for ultimate comfort and relaxation at home", "10",10)
-        def add_items_to_room(room, items):
-            """
-        Ajoute des items à une room après avoir vérifié que 'items' est un set.
-        """
-            if isinstance(room, Room):
-                if isinstance(room.items, set):
-                    room.items.update(items)
-                else:
-                    print(f"Erreur : {room.name}.items is not a set ! Type actuel : {type(room.items)}")
-            else:
-                print(f"Erreur : L'objet passé n'est pas une instance de Room.")
 
-
-        add_items_to_room(sweaters_section, {sweater, turtleneck, jumper, sweatshirt})
-        add_items_to_room(coats_section, {coat, puffer, trench, fur_coat})
-        add_items_to_room(bottoms_section, {jeans, pants, skirt, shorts})
-        add_items_to_room(tops_section, {bandeau, tshirt, shirt, croptop})
-        add_items_to_room(sunglasses_section, {leopard_sunglasses, square_sunglasses, oversized_sunglasses})
-        add_items_to_room(accessories_section, {scarf1, scarf2, beanie, gloves})
-        add_items_to_room(shoes_section, {heels, boots, slippers, sneakers})
-        add_items_to_room(jewelry, {ring, necklace, earrings, watch})
     def _setup_characters(self):
-        """Ajoute des personnages aux salles."""
+        """
+        Adds characters to rooms.
+        """
         cashier = Character(
             "Cashier",
-            "Gère les paiements et vérifie les achats.",
+            "Manages payments and checks purchases.",
             self.rooms[2],
-            dialogues=["Bonjour ! Prêt à passer en caisse ?"],
+            dialogues=["Hello! Ready to check out?"],
         )
         assistant_sales = Character(
             "Assistant Sales",
-            "Aide les clients à trouver des produits.",
+            "Helps customers find products.",
             self.rooms[1],
-            dialogues=["Puis-je vous aider à trouver quelque chose ?"],
+            dialogues=["Can I help you find something?"],
         )
+        self.rooms[11].character = cashier
+        self.rooms[1].character = assistant_sales

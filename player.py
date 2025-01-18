@@ -33,7 +33,7 @@ class Player:
             Assigns a random gift card value between 50 and 200 to the player.
     """
 
-    def __init__(self,name: str, height: str, eyes: str, hair: str,style: str, current_room=None):
+    def __init__(self,name,eyes,hair,height,style,cart,total,gift_card,current_room,room_history):
         """
         Initializes the Player instance.
 
@@ -46,9 +46,13 @@ class Player:
             current_room (Room, optional): The initial room where the player starts.
             Defaults to None.
         """
-        self.personal_info = {"name": name, "hair": hair, "eyes": eyes, "height": height}
+        self.name = name
+        self.eyes = eyes
+        self.hair=hair
+        self.height = height
         self.style = style
-        self.cart = {}
+        self.cart = cart if cart is not None else {}
+        self.total = total
         self.gift_card = random.randint(50, 200)
         self.current_room = current_room
         self.room_history = []

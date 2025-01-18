@@ -24,7 +24,7 @@ class Item:
             Checks if the item is available in stock.
     """
 
-    def __init__(self, name: str, description: str, price: int, discount: float, quantity: int):
+    def __init__(self, name: str, description: str, price: int,discount, quantity: int):
         """
         Initializes an Item instance with name, description, price, quantity, and discount.
 
@@ -38,7 +38,7 @@ class Item:
         self.name = name.strip()
         self.description = description
         self.price = int(price)
-        self.discount = discount
+        self.discount=float(discount)
         self.quantity = int(quantity)
 
     def discounted_price(self) -> float:
